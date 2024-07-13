@@ -1,0 +1,49 @@
+package org.speer.assessment.controllers;
+
+import org.speer.assessment.annotations.MyRateLimiter;
+import org.speer.assessment.dtos.LoginUserDto;
+import org.speer.assessment.dtos.RegisterUserDto;
+import org.speer.assessment.entities.User;
+import org.speer.assessment.responses.LoginResponse;
+import org.speer.assessment.services.AuthenticationService;
+import org.speer.assessment.services.JwtService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequestMapping("/api/auth")
+@RestController
+public class AuthenticationController {
+    private final JwtService jwtService;
+    private final AuthenticationService authenticationService;
+
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
+        this.jwtService = jwtService;
+        this.authenticationService = authenticationService;
+    }
+
+    @MyRateLimiter(value = "0.1", timeout = "1")
+    @PostMapping("/signup")
+    public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
+        if (!registerUserDto.getPassword().equals(registerUserDto.getRepeatPassword()))
+            throw new IllegalArgumentException("Re-entered password not consistent to password");
+        User registeredUser = authenticationService.signup(registerUserDto);
+
+        return ResponseEntity.ok(registeredUser);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
+        User authenticatedUser = authenticationService.authenticate(loginUserDto);
+
+        String jwtToken = jwtService.generateToken(authenticatedUser);
+
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setToken(jwtToken);
+        loginResponse.setExpiresIn(jwtService.getExpirationTime());
+
+        return ResponseEntity.ok(loginResponse);
+    }
+}

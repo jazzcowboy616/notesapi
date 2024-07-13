@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: notesapi
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/notedb
+    username: postgres
+    password: ChangeMe123
+  security:
+    user:
+      name: root
+      password: 123
+  jpa:
+    database-platform: org.speer.assessment.configs.CustomPostgreSQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+security:
+  jwt:
+    secret-key: 3cd79fc2edd89fb57df9a8f36a72ea3873153b5900271ab8c45b4f8a8368d639
+    # 24h in millisecond
+    expiration-time: 86400000
+web:
+  ratelimiter:
+    qps: 1.0
+    timeout: 10
+#logging:
+#  file:
+#    name: ./logs/assessment.log
