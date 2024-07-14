@@ -6,7 +6,6 @@ import org.speer.assessment.dtos.NoteFilter;
 import org.speer.assessment.dtos.ShareNoteDto;
 import org.speer.assessment.entities.Note;
 import org.speer.assessment.entities.User;
-import org.speer.assessment.repositories.NoteRepository;
 import org.speer.assessment.services.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,9 +22,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class NoteController {
-
-    @Autowired
-    private NoteRepository repo;
 
     @Autowired
     private NoteService service;

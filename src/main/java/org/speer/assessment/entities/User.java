@@ -1,7 +1,9 @@
 package org.speer.assessment.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +13,9 @@ import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 @DynamicUpdate
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 @Table(name = "users")
 public class User implements UserDetails {
     private static final long serialVersionUID = 7419229779731522702L;
@@ -67,9 +71,6 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.name = name;
-    }
-
-    public User() {
     }
 
 }

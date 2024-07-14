@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class AuthenticationService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public User signup(RegisterUserDto input) {
         Optional<User> dbUser = userRepository.findByEmail(input.getEmail());
         if (dbUser.isPresent())
@@ -42,6 +44,7 @@ public class AuthenticationService {
         return userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public User authenticate(LoginUserDto input) {
         User user = userRepository.findByEmail(input.getEmail()).orElseThrow();
         authenticationManager.authenticate(
