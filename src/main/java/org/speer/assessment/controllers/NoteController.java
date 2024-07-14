@@ -1,8 +1,8 @@
 package org.speer.assessment.controllers;
 
 import org.speer.assessment.annotations.MyRateLimiter;
+import org.speer.assessment.dtos.NoteDto;
 import org.speer.assessment.dtos.NoteFilter;
-import org.speer.assessment.dtos.NoteOutputDto;
 import org.speer.assessment.entities.Note;
 import org.speer.assessment.entities.User;
 import org.speer.assessment.repositories.NoteRepository;
@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class NoteController {
-    @Autowired
-    private CustomerNoteMapper mapper;
 
     @Autowired
     private NoteRepository repo;
@@ -30,7 +28,7 @@ public class NoteController {
     private NoteService service;
 
     @GetMapping("/search")
-    public Page<NoteOutputDto> getAll(
+    public Page<NoteDto> getAll(
             NoteFilter filter,
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
     ) {
@@ -42,7 +40,7 @@ public class NoteController {
 
     @MyRateLimiter(value = "0.1", timeout = "1")
     @GetMapping("/notes")
-    public Page<NoteOutputDto> getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public Page<NoteDto> getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
         NoteFilter filter = new NoteFilter(null, me);
@@ -51,35 +49,36 @@ public class NoteController {
 
     @MyRateLimiter(value = "0.1", timeout = "1")
     @GetMapping("/notes/{id}")
-    public NoteOutputDto getNote(@PathVariable Long id) {
-        Note note = repo.findById(id).get();
-        return new NoteOutputDto(note);
+    public NoteDto getNote(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User me = (User) authentication.getPrincipal();
+        Note note = service.getNote(id, me);
+        return new NoteDto(note);
     }
 
     @MyRateLimiter(value = "0.1", timeout = "1")
     @PostMapping("/notes")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public void createNote(@RequestBody Note note) {
+    public void createNote(@RequestBody NoteDto noteDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
-        note.setAuthor(me);
-        // do more thing, text indexing
-        repo.save(note);
+        service.createNote(noteDto, me);
     }
 
     @MyRateLimiter(value = "0.1", timeout = "1")
     @PutMapping("/notes")
-    public void updateNote(@RequestBody Note note) {
-        Note myNote = repo.getReferenceById(note.getId());
-        mapper.updateCustomerFromReq(note, myNote);
-        // refresh text indexing
-        repo.save(myNote);
+    public void updateNote(@RequestBody NoteDto noteDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User me = (User) authentication.getPrincipal();
+        service.updateNote(noteDto, me);
     }
 
     @MyRateLimiter(value = "0.1", timeout = "1")
     @DeleteMapping("/notes/{id}")
     public void deleteNote(@PathVariable Long id) {
-        repo.deleteById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User me = (User) authentication.getPrincipal();
+        service.deleteNote(id, me);
     }
 
 }

@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.speer.assessment.exceptions.RateLimiterException;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +38,7 @@ public class RateLimiterAspect {
 
             if (RATE_LIMITER_CACHE.get(method.getName()) != null
                     && !RATE_LIMITER_CACHE.get(method.getName()).tryAcquire(Integer.parseInt(rateLimiter.timeout()), rateLimiter.timeUnit())) {
-                throw new RuntimeException("Request too frequently, please try later.");
+                throw new RateLimiterException();
             }
         }
         return point.proceed();

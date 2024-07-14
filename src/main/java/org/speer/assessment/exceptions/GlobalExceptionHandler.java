@@ -32,10 +32,16 @@ public class GlobalExceptionHandler {
             return errorDetail;
         }
 
-
         if (exception instanceof BadCredentialsException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), exception.getMessage());
             errorDetail.setProperty("description", "The username or password is incorrect");
+
+            return errorDetail;
+        }
+
+        if (exception instanceof NotAuthorOperationException) {
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
+            errorDetail.setProperty("description", exception.getMessage());
 
             return errorDetail;
         }
@@ -58,6 +64,11 @@ public class GlobalExceptionHandler {
         if (exception instanceof ExpiredJwtException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
             errorDetail.setProperty("description", "The JWT token has expired");
+        }
+
+        if (exception instanceof RateLimiterException) {
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(429), exception.getMessage());
+            errorDetail.setProperty("description", exception.getMessage());
         }
 
         if (errorDetail == null) {
