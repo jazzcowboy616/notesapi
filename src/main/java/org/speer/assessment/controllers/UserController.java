@@ -17,7 +17,7 @@ public class UserController {
 
     @MyRateLimiter(value = "0.1", timeout = "1")
     @GetMapping("{id}")
-    public User getById(@PathVariable Integer id) {
-        return repo.findById(id).get();
+    public User getById(@PathVariable Long id) {
+        return repo.getReferenceById(id);
     }
 }

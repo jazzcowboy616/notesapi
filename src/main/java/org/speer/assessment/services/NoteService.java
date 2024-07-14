@@ -3,10 +3,12 @@ package org.speer.assessment.services;
 import org.speer.assessment.controllers.CustomerNoteMapper;
 import org.speer.assessment.dtos.NoteDto;
 import org.speer.assessment.dtos.NoteFilter;
+import org.speer.assessment.dtos.ShareNoteDto;
 import org.speer.assessment.entities.Note;
 import org.speer.assessment.entities.User;
 import org.speer.assessment.exceptions.NotAuthorOperationException;
 import org.speer.assessment.repositories.NoteRepository;
+import org.speer.assessment.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +23,18 @@ public class NoteService {
     @Autowired
     private NoteRepository repo;
 
+    @Autowired
+    UserRepository userRepo;
+
+    @Transactional(readOnly = true)
+    public Page<NoteDto> getAll(NoteFilter filter, Pageable pageable) {
+        return repo.findAll(filter.toPredicate(), pageable)
+                .map(NoteDto::new);
+    }
+
     @Transactional(readOnly = true)
     public Note getNote(Long id, User author) {
-        Note note = repo.findById(id).orElseThrow();
+        Note note = repo.getReferenceById(id);
         if (!note.getAuthor().equals(author))
             throw new NotAuthorOperationException();
         return note;
@@ -54,9 +65,13 @@ public class NoteService {
         repo.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
-    public Page<NoteDto> getAll(NoteFilter filter, Pageable pageable) {
-        return repo.findAll(filter.toPredicate(), pageable)
-                .map(NoteDto::new);
+    @Transactional
+    public void shareNote(Long id, ShareNoteDto dto, User author) {
+        Note note = repo.getReferenceById(id);
+        if (!note.getAuthor().equals(author))
+            throw new NotAuthorOperationException();
+        User toShare = userRepo.getReferenceById(dto.getShareUserId());
+        note.getShareList().add(toShare);
+        repo.save(note);
     }
 }

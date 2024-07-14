@@ -3,6 +3,7 @@ package org.speer.assessment.controllers;
 import org.speer.assessment.annotations.MyRateLimiter;
 import org.speer.assessment.dtos.NoteDto;
 import org.speer.assessment.dtos.NoteFilter;
+import org.speer.assessment.dtos.ShareNoteDto;
 import org.speer.assessment.entities.Note;
 import org.speer.assessment.entities.User;
 import org.speer.assessment.repositories.NoteRepository;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,23 +31,25 @@ public class NoteController {
     private NoteService service;
 
     @GetMapping("/search")
-    public Page<NoteDto> getAll(
+    public PagedModel<NoteDto> getAll(
             NoteFilter filter,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable, PagedResourcesAssembler assembler
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
         filter.setAuthor(me);
-        return service.getAll(filter, pageable);
+        Page<NoteDto> notes = service.getAll(filter, pageable);
+        return assembler.toModel(notes);
     }
 
     @MyRateLimiter(value = "0.1", timeout = "1")
     @GetMapping("/notes")
-    public Page<NoteDto> getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public PagedModel getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable, PagedResourcesAssembler assembler) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
         NoteFilter filter = new NoteFilter(null, me);
-        return service.getAll(filter, pageable);
+        Page<NoteDto> notes = service.getAll(filter, pageable);
+        return assembler.toModel(notes);
     }
 
     @MyRateLimiter(value = "0.1", timeout = "1")
@@ -79,6 +84,14 @@ public class NoteController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
         service.deleteNote(id, me);
+    }
+
+    @MyRateLimiter(value = "0.1", timeout = "1")
+    @PostMapping("/notes/{id}/share")
+    public void shareNote(@PathVariable Long id, @RequestBody ShareNoteDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User me = (User) authentication.getPrincipal();
+        service.shareNote(id, dto, me);
     }
 
 }

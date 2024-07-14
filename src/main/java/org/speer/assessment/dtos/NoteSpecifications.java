@@ -1,5 +1,6 @@
 package org.speer.assessment.dtos;
 
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.speer.assessment.entities.Note;
 import org.speer.assessment.entities.User;
@@ -30,7 +31,13 @@ public class NoteSpecifications {
     }
 
     public static Specification<Note> author(User author) {
-        return (root, query, cb) -> author == null ? null :
-                cb.equal(root.get("author"), author);
+        return (root, query, cb) -> {
+            List<Predicate> listOr = new ArrayList<>();
+            listOr.add(cb.equal(root.get("author"), author));
+            listOr.add(cb.equal(root.joinSet("shareList", JoinType.LEFT), author));
+            Predicate[] arrayOr = new Predicate[listOr.size()];
+            Predicate pre_or = cb.or(listOr.toArray(arrayOr));
+            return query.where(pre_or).getRestriction();
+        };
     }
 }

@@ -2,6 +2,7 @@ package org.speer.assessment.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,14 +11,17 @@ import java.util.List;
 
 @Data
 @Entity
+@DynamicUpdate
 @Table(name = "users")
 public class User implements UserDetails {
+    private static final long serialVersionUID = 7419229779731522702L;
+
     public static String DEFAULT_ROLE = "USER";
 
     @Id
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -58,7 +62,7 @@ public class User implements UserDetails {
         return true;
     }
 
-    public User(Integer id, String email, String password, String name) {
+    public User(Long id, String email, String password, String name) {
         this.id = id;
         this.email = email;
         this.password = password;
