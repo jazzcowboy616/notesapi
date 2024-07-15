@@ -201,6 +201,7 @@ public class NoteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.noteDtoList[0]").exists());
+        verify(noteService, times(1)).getAll(any(NoteFilter.class), any(Pageable.class));
     }
 
     @Test
@@ -222,5 +223,6 @@ public class NoteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.noteDtoList[0]").exists());
+        verify(noteService, times(1)).getAll(any(NoteFilter.class), any(Pageable.class));
     }
 }

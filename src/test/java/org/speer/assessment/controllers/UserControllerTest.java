@@ -70,7 +70,7 @@ public class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/api/users/2")
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isNotFound());
 //        Assertions.assertThrows(EntityNotFoundException.class, () -> controller.getById(2L));
     }
 }

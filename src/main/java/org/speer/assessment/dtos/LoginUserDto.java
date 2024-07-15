@@ -1,5 +1,6 @@
 package org.speer.assessment.dtos;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,15 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginUserDto {
+    @NotNull
     private String email;
+    @NotNull
     private String password;
-
-    @Override
-    public String toString() {
-        return "LoginUserDto{" +
-                "email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
 }
 
