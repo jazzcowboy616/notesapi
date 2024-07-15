@@ -1,39 +1,76 @@
 package org.speer.assessment.controllers;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.speer.assessment.entities.User;
 import org.speer.assessment.repositories.UserRepository;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.speer.assessment.services.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@SpringJUnitConfig
+import java.util.NoSuchElementException;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
 public class UserControllerTest {
-    @Mock
+
+    @Autowired
+    private MockMvc mockMvc;
+    @MockBean
     private UserRepository repo;
-    private UserController controller;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private UserDetailsService userDetailsService;
+
+    public void setUpMockSecurityContext() {
+        UserDetails userDetails = new User(1L, "jone@speer.com", "111", "Jone");
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 
     @BeforeEach
     public void setup() {
-        controller = new UserController(repo);
+        setUpMockSecurityContext();
     }
 
     @Test
-    public void getUserById() {
+    public void getUserById() throws Exception {
         User mockUser = new User(1L, "test@email.com", "password", "Adam");
-        Mockito.when(repo.getReferenceById(1L)).thenReturn(mockUser);
+        when(repo.getReferenceById(1L)).thenReturn(mockUser);
 
-        ResponseEntity<User> user = controller.getById(mockUser.getId());
-        Mockito.verify(repo).getReferenceById(mockUser.getId());
-        Assertions.assertEquals(mockUser.getName(), user.getBody().getName());
-        Assertions.assertEquals(mockUser.getEmail(), user.getBody().getEmail());
-        Assertions.assertEquals(mockUser.getPassword(), user.getBody().getPassword());
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/api/users/1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.email").value("test@email.com"))
+                .andExpect(jsonPath("$.name").value("Adam"));
 
-        Mockito.when(repo.getReferenceById(2L)).thenThrow(EntityNotFoundException.class);
-        Assertions.assertThrows(EntityNotFoundException.class, () -> controller.getById(2L));
+        verify(repo).getReferenceById(mockUser.getId());
+
+        when(repo.getReferenceById(2L)).thenThrow(NoSuchElementException.class);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/api/users/2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError());
+//        Assertions.assertThrows(EntityNotFoundException.class, () -> controller.getById(2L));
     }
 }

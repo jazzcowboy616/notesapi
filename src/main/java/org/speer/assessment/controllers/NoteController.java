@@ -1,5 +1,6 @@
 package org.speer.assessment.controllers;
 
+import jakarta.validation.Valid;
 import org.speer.assessment.annotations.MyRateLimiter;
 import org.speer.assessment.dtos.NoteDto;
 import org.speer.assessment.dtos.NoteFilter;
@@ -14,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -43,38 +45,37 @@ public class NoteController {
 
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/notes")
-    public PagedModel getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable, PagedResourcesAssembler assembler) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User me = (User) authentication.getPrincipal();
-        NoteFilter filter = new NoteFilter(null, me);
-        Page<NoteDto> notes = service.getAll(filter, pageable);
-        return assembler.toModel(notes);
+    public PagedModel getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC)
+                                  Pageable pageable, PagedResourcesAssembler assembler) {
+        return getAll(new NoteFilter(), pageable, assembler);
     }
 
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/notes/{id}")
-    public NoteDto getNote(@PathVariable Long id) {
+    public ResponseEntity<NoteDto> getNote(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
         Note note = service.getNote(id, me);
-        return new NoteDto(note);
+        return ResponseEntity.ok(new NoteDto(note));
     }
 
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/notes")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public void createNote(@RequestBody NoteDto noteDto) {
+    public ResponseEntity<NoteDto> createNote(@Valid @RequestBody NoteDto noteDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
-        service.createNote(noteDto, me);
+        Note note = service.createNote(noteDto, me);
+        return new ResponseEntity(new NoteDto(note), HttpStatus.CREATED);
     }
 
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
-    @PutMapping("/notes")
-    public void updateNote(@RequestBody NoteDto noteDto) {
+    @PutMapping("/notes/{id}")
+    public ResponseEntity<NoteDto> updateNote(@PathVariable Long id, @RequestBody NoteDto noteDto) {
+        noteDto.setId(id);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
-        service.updateNote(noteDto, me);
+        Note note = service.updateNote(noteDto, me);
+        return ResponseEntity.ok(new NoteDto(note));
     }
 
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
@@ -87,7 +88,7 @@ public class NoteController {
 
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/notes/{id}/share")
-    public void shareNote(@PathVariable Long id, @RequestBody ShareNoteDto dto) {
+    public void shareNote(@PathVariable Long id, @Valid @RequestBody ShareNoteDto dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User me = (User) authentication.getPrincipal();
         service.shareNote(id, dto, me);

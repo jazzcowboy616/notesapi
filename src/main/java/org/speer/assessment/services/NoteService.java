@@ -43,20 +43,22 @@ public class NoteService {
     }
 
     @Transactional
-    public void createNote(NoteDto noteDto, User author) {
+    public Note createNote(NoteDto noteDto, User author) {
         Note note = new Note();
         mapper.updateCustomerFromReq(noteDto, note);
         note.setAuthor(author);
         repo.save(note);
+        return note;
     }
 
     @Transactional
-    public void updateNote(NoteDto noteDto, User author) {
-        Note myNote = repo.getReferenceById(noteDto.getId());
-        if (!myNote.getAuthor().equals(author))
+    public Note updateNote(NoteDto noteDto, User author) {
+        Note note = repo.getReferenceById(noteDto.getId());
+        if (!note.getAuthor().equals(author))
             throw new NotAuthorOperationException();
-        mapper.updateCustomerFromReq(noteDto, myNote);
-        repo.save(myNote);
+        mapper.updateCustomerFromReq(noteDto, note);
+        repo.save(note);
+        return note;
     }
 
     @Transactional

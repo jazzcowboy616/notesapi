@@ -2,13 +2,17 @@ package org.speer.assessment.exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,6 +25,13 @@ public class GlobalExceptionHandler {
         if (exception instanceof IllegalArgumentException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), exception.getMessage());
             errorDetail.setProperty("description", exception.getMessage());
+
+            return errorDetail;
+        }
+
+        if (exception instanceof MethodArgumentNotValidException) {
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), exception.getMessage());
+            errorDetail.setProperty("description", "Invalid request content");
 
             return errorDetail;
         }
@@ -64,6 +75,11 @@ public class GlobalExceptionHandler {
         if (exception instanceof ExpiredJwtException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
             errorDetail.setProperty("description", "The JWT token has expired");
+        }
+
+        if (exception instanceof EntityNotFoundException || exception instanceof NoSuchElementException) {
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(404), exception.getMessage());
+            errorDetail.setProperty("description", "Cannot find the data");
         }
 
         if (exception instanceof RateLimiterException) {
