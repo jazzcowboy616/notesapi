@@ -7,7 +7,6 @@ import org.speer.assessment.dtos.ShareNoteDto;
 import org.speer.assessment.entities.Note;
 import org.speer.assessment.entities.User;
 import org.speer.assessment.services.NoteService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,9 +22,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class NoteController {
 
-    @Autowired
-    private NoteService service;
+    private final NoteService service;
 
+    public NoteController(NoteService service) {
+        this.service = service;
+    }
+
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/search")
     public PagedModel<NoteDto> getAll(
             NoteFilter filter,
@@ -38,7 +41,7 @@ public class NoteController {
         return assembler.toModel(notes);
     }
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/notes")
     public PagedModel getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable, PagedResourcesAssembler assembler) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -48,7 +51,7 @@ public class NoteController {
         return assembler.toModel(notes);
     }
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/notes/{id}")
     public NoteDto getNote(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -57,7 +60,7 @@ public class NoteController {
         return new NoteDto(note);
     }
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/notes")
     @ResponseStatus(code = HttpStatus.CREATED)
     public void createNote(@RequestBody NoteDto noteDto) {
@@ -66,7 +69,7 @@ public class NoteController {
         service.createNote(noteDto, me);
     }
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PutMapping("/notes")
     public void updateNote(@RequestBody NoteDto noteDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -74,7 +77,7 @@ public class NoteController {
         service.updateNote(noteDto, me);
     }
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @DeleteMapping("/notes/{id}")
     public void deleteNote(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -82,7 +85,7 @@ public class NoteController {
         service.deleteNote(id, me);
     }
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/notes/{id}/share")
     public void shareNote(@PathVariable Long id, @RequestBody ShareNoteDto dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

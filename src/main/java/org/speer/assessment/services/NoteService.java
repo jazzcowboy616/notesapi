@@ -9,7 +9,6 @@ import org.speer.assessment.entities.User;
 import org.speer.assessment.exceptions.NotAuthorOperationException;
 import org.speer.assessment.repositories.NoteRepository;
 import org.speer.assessment.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,14 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NoteService {
-    @Autowired
-    private CustomerNoteMapper mapper;
+    private final CustomerNoteMapper mapper;
 
-    @Autowired
-    private NoteRepository repo;
+    private final NoteRepository repo;
 
-    @Autowired
-    UserRepository userRepo;
+    private final UserRepository userRepo;
+
+    public NoteService(CustomerNoteMapper mapper, NoteRepository repo, UserRepository userRepo) {
+        this.mapper = mapper;
+        this.repo = repo;
+        this.userRepo = userRepo;
+    }
 
     @Transactional(readOnly = true)
     public Page<NoteDto> getAll(NoteFilter filter, Pageable pageable) {

@@ -26,8 +26,8 @@ security:
     expiration-time: 86400000
 web:
   ratelimiter:
-    qps: 1.0
-    timeout: 10
+    qps: 1
+    timeout: 1
 #logging:
 #  file:
 #    name: ./logs/assessment.log

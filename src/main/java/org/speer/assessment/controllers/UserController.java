@@ -3,7 +3,7 @@ package org.speer.assessment.controllers;
 import org.speer.assessment.annotations.MyRateLimiter;
 import org.speer.assessment.entities.User;
 import org.speer.assessment.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,12 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-    @Autowired
-    UserRepository repo;
+    private final UserRepository repo;
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    public UserController(UserRepository repo) {
+        this.repo = repo;
+    }
+
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("{id}")
-    public User getById(@PathVariable Long id) {
-        return repo.getReferenceById(id);
+    public ResponseEntity<User> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(repo.getReferenceById(id));
     }
 }

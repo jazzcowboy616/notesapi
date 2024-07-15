@@ -1,5 +1,6 @@
 package org.speer.assessment.controllers;
 
+import jakarta.validation.Valid;
 import org.speer.assessment.annotations.MyRateLimiter;
 import org.speer.assessment.dtos.LoginUserDto;
 import org.speer.assessment.dtos.RegisterUserDto;
@@ -13,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/auth")
 @RestController
+@RequestMapping("/api/auth")
 public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
@@ -24,9 +25,9 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @MyRateLimiter(value = "0.1", timeout = "1")
+    @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
         if (!registerUserDto.getPassword().equals(registerUserDto.getRepeatPassword()))
             throw new IllegalArgumentException("Re-entered password not consistent to password");
         User registeredUser = authenticationService.signup(registerUserDto);
