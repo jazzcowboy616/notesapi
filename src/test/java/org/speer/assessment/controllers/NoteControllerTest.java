@@ -162,8 +162,9 @@ public class NoteControllerTest {
     public void testShareNote() throws Exception {
         User author = new User(1L, "jone@speer.com", "111", "Jone");
         ShareNoteDto dto = new ShareNoteDto(2L);
+        Note note = new Note();
 
-        doNothing().when(noteService).shareNote(1L, dto, author);
+        when(noteService.shareNote(1L, dto, author)).thenReturn(note);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/notes/1/share")
@@ -213,7 +214,9 @@ public class NoteControllerTest {
         note.setAuthor("Jone");
         Pageable pageable = PageRequest.of(0, 10);
         Page<NoteDto> notes = new PageImpl<>(Collections.singletonList(note), pageable, 1);
+        Page<NoteDto> emptyNotes = new PageImpl<>(Collections.emptyList(), pageable, 1);
         PagedModel<NoteDto> pagedModel = PagedModel.of(Collections.singletonList(note), new PagedModel.PageMetadata(1, 0, 1));
+        PagedModel<NoteDto> emptyModel = PagedModel.of(Collections.emptyList(), new PagedModel.PageMetadata(0, 0, 0));
 
         when(noteService.getAll(any(NoteFilter.class), any(Pageable.class))).thenReturn(notes);
         when(assembler.toModel(any(Page.class))).thenReturn(pagedModel);
@@ -224,5 +227,13 @@ public class NoteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.noteDtoList[0]").exists());
         verify(noteService, times(1)).getAll(any(NoteFilter.class), any(Pageable.class));
+
+        when(noteService.getAll(any(NoteFilter.class), any(Pageable.class))).thenReturn(emptyNotes);
+        when(assembler.toModel(any(Page.class))).thenReturn(emptyModel);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/api/notes")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.noteDtoList[0]").doesNotExist());
     }
 }

@@ -47,8 +47,7 @@ public class NoteService {
         Note note = new Note();
         mapper.updateCustomerFromReq(noteDto, note);
         note.setAuthor(author);
-        repo.save(note);
-        return note;
+        return repo.save(note);
     }
 
     @Transactional
@@ -57,8 +56,7 @@ public class NoteService {
         if (!note.getAuthor().equals(author))
             throw new NotAuthorOperationException();
         mapper.updateCustomerFromReq(noteDto, note);
-        repo.save(note);
-        return note;
+        return repo.save(note);
     }
 
     @Transactional
@@ -70,12 +68,12 @@ public class NoteService {
     }
 
     @Transactional
-    public void shareNote(Long id, ShareNoteDto dto, User author) {
+    public Note shareNote(Long id, ShareNoteDto dto, User author) {
         Note note = repo.getReferenceById(id);
         if (!note.getAuthor().equals(author))
             throw new NotAuthorOperationException();
         User toShare = userRepo.getReferenceById(dto.getShareUserId());
         note.getShareList().add(toShare);
-        repo.save(note);
+        return repo.save(note);
     }
 }

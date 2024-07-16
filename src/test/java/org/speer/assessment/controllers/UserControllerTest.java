@@ -71,6 +71,5 @@ public class UserControllerTest {
                         .get("/api/users/2")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-//        Assertions.assertThrows(EntityNotFoundException.class, () -> controller.getById(2L));
     }
 }

@@ -6,15 +6,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/notedb
     username: postgres
     password: ChangeMe123
-  security:
-    user:
-      name: root
-      password: 123
   jpa:
     database-platform: org.speer.assessment.configs.CustomPostgreSQLDialect
     open-in-view: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
