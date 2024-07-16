@@ -20,7 +20,7 @@ keywords.
 
 ## Get Started
 
-See the [guide](https://github.com/joshua-booth/notes-api/blob/main/GETTING_STARTED.md) on getting started with the Note
+See the [guide](https://github.com/jazzcowboy616/notesapi/blob/master/QuickStarted.md) on getting started with the Note
 API.
 
 ## Test
