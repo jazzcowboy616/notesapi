@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicUpdate
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
-@Table(name = "users")
+@Table(name = "t_users")
 public class User implements UserDetails {
     private static final long serialVersionUID = 7419229779731522702L;
 

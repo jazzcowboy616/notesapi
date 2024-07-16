@@ -15,7 +15,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @DynamicUpdate
-@Table(name = "notes")
+@Table(name = "t_notes")
 public class Note implements Serializable {
     private static final long serialVersionUID = 7419229779731522702L;
 
@@ -39,7 +39,7 @@ public class Note implements Serializable {
     private String contentSearchVector;
 
     @ManyToMany(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    @JoinTable(name = "note_share",
+    @JoinTable(name = "t_note_share",
             joinColumns = {@JoinColumn(name = "note_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")}
     )
