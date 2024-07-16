@@ -3,9 +3,9 @@ spring:
     name: notesapi
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/notedb
-    username: postgres
-    password: ChangeMe123
+    url: jdbc:postgresql://NMVlrypYLuxGqCoAaCUayxuDxue7XFtA@dpg-cqbcvh8gph6c73fqus30-a.oregon-postgres.render.com/notedb_0vd5
+    username: notedb_0vd5_user
+    password: NMVlrypYLuxGqCoAaCUayxuDxue7XFtA
   jpa:
     database-platform: org.speer.assessment.configs.CustomPostgreSQLDialect
     open-in-view: true
