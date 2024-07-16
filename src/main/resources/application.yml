@@ -24,6 +24,6 @@ web:
   ratelimiter:
     qps: 1
     timeout: 1
-#logging:
-#  file:
-#    name: ./logs/assessment.log
+logging:
+  file:
+    name: ./logs/api.log
