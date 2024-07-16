@@ -23,6 +23,7 @@ public class NoteSpecifications {
                             cb.function("plainto_tsquery", String.class, cb.literal(search))
                     )
             ));
+            listOr.add(cb.like(root.get("title"), "%" + search + "%"));
             listOr.add(cb.like(root.get("content"), "%" + search + "%"));
             Predicate[] arrayOr = new Predicate[listOr.size()];
             Predicate pre_or = cb.or(listOr.toArray(arrayOr));
