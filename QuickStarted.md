@@ -1,20 +1,21 @@
 # Getting Started
 
-### Prerequisites
+- ### Prerequisites
 
-- Java 11 or higher
-- Maven 3.6.3 or higher
-- PostgreSQL
+  - Java 11 or higher
+  - Maven 3.6.3 or higher
+  - PostgreSQL
 
-### **Installation**
+- ### **Installation**
 
-**1. Clone the repository:**
+  **1. Clone the repository:**
 
-   ```bash
-   git clone https://github.com/jazzcowboy616/notesapi.git
-   cd notesapi
+    ```bash
+    $ git clone https://github.com/jazzcowboy616/notesapi.git
+    $ cd notesapi
+    ```
 
-**2. Create the database:**
+  **2. Create the database:**
 
    ```sql
    CREATE
@@ -30,9 +31,10 @@
       IS_TEMPLATE = False;
    ```
 
-**3. Configure the database:**
+  **3. Configure the database:**
 
    ```yaml
+   # `application.yml`
    spring:
       datasource:
          driver-class-name: org.postgresql.Driver
@@ -41,25 +43,37 @@
          password: password
    ```
 
-**4. Execute DDL and DML scripts:**
+  **4. Execute DDL and DML scripts:**
 
-You can directly execute the DDL and DML scripts in the `src/main/resources/DBScripts` directory to create the tables
-and insert the initial data.
-![DDL & DML scripts](dbscript.png)
+  You can directly execute the DDL and DML scripts in the `src/main/resources/DBScripts` directory to create the tables
+  and insert the initial data.
 
-Of course, you can also change the jpa config in `application.yml` to let application create the tables automatically.
-![jpa config](jpaconfig.png)
+  ![DDL & DML scripts](dbscript.png)
 
-### **Run**
+  Of course, you can also change the jpa config in `application.yml` to let application create the tables automatically.
 
-**Linux:**
+    ```yaml
+      jpa:
+        database-platform: org.speer.assessment.configs.CustomPostgreSQLDialect
+        open-in-view: true
+        hibernate:
+          ddl-auto: validate  <-- change to 'update' to enable DDL handling
+        show-sql: false
+        properties:
+          hibernate:
+            format_sql: true
+    ```
+
+- ### **Run**
+
+  **Linux:**
 
    ```bash
    cd ${application.home}
    ./mvn spring-boot:run
    ```
 
-**Windows:**
+  **Windows:**
 
    ```bash
    cd ${application.home}
@@ -103,7 +117,6 @@ Of course, you can also change the jpa config in `application.yml` to let applic
    2024-07-16T11:51:25.533-07:00  INFO 8828 --- [notesapi] [           main] o.s.assessment.AssessmentApplication     : Started AssessmentApplication in 3.565 seconds (process running for 3.848)
    ```
 
-Now you can access the application at `http://localhost:8080`
+  Now you can access the application at `http://localhost:8080`
 
-**Note:**
-log file at `logs/notesapi.log`
+  _**Note:** log file at `logs/notesapi.log`_
