@@ -30,6 +30,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Filter the url, all urls are required to check the authentication except the urls starting with "/api/auth" prefix
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**")
@@ -37,6 +38,7 @@ public class SecurityConfig {
                         .anyRequest()
                         .authenticated());
         http.httpBasic(basic -> basic.disable());
+        // here csrs is not necessary, disable it.
         http.csrf(csrf -> csrf.disable());
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

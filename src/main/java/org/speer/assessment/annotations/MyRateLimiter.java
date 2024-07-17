@@ -5,6 +5,12 @@ import org.springframework.core.annotation.AliasFor;
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * MyRateLimiter is used to add rate limiting on the specific methods.
+ * permitsPerSecond: numbers of requests allowed every second
+ * timeout: interval of each request to get token
+ * timeunit: time unit, second by default
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

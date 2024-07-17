@@ -38,6 +38,7 @@ public class RateLimiterAspect implements EnvironmentAware {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
 
+        // Fetch the config value of the annotation from the method
         MyRateLimiter rateLimiter = AnnotationUtils.findAnnotation(method, MyRateLimiter.class);
         assert rateLimiter != null;
         double qps = Double.parseDouble(environment.resolvePlaceholders(rateLimiter.value()));

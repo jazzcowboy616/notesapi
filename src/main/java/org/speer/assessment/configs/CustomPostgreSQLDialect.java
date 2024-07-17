@@ -8,6 +8,11 @@ public class CustomPostgreSQLDialect extends PostgreSQLDialect {
         super();
     }
 
+    /**
+     * To define function "tsvector_match" for text indexing filter
+     *
+     * @param functionContributions
+     */
     @Override
     public void initializeFunctionRegistry(FunctionContributions functionContributions) {
         super.initializeFunctionRegistry(functionContributions);

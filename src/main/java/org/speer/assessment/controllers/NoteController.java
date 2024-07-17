@@ -30,6 +30,16 @@ public class NoteController {
         this.service = service;
     }
 
+    /**
+     * search for notes based on keywords for the authenticated user.
+     * Only return the contents created by or shared to current user
+     * GET /api/search?search={query}
+     *
+     * @param filter    search={query}
+     * @param pageable
+     * @param assembler
+     * @return
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/search")
     public PagedModel<NoteDto> getAll(
@@ -43,6 +53,13 @@ public class NoteController {
         return assembler.toModel(notes);
     }
 
+    /**
+     * Get a list of all notes for the authenticated user.
+     * Only return the contents created by or shared to current user
+     * @param pageable
+     * @param assembler
+     * @return
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/notes")
     public PagedModel getNoteList(@PageableDefault(sort = "id", direction = Sort.Direction.ASC)
@@ -50,6 +67,11 @@ public class NoteController {
         return getAll(new NoteFilter(), pageable, assembler);
     }
 
+    /**
+     * Get a note by ID for the authenticated user.
+     * @param id
+     * @return
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("/notes/{id}")
     public ResponseEntity<NoteDto> getNote(@PathVariable Long id) {
@@ -59,6 +81,12 @@ public class NoteController {
         return ResponseEntity.ok(new NoteDto(note));
     }
 
+    /**
+     * Create a new note for the authenticated user.
+     * title and content are mandatory
+     * @param noteDto
+     * @return
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/notes")
     public ResponseEntity<NoteDto> createNote(@Valid @RequestBody NoteDto noteDto) {
@@ -68,6 +96,12 @@ public class NoteController {
         return new ResponseEntity(new NoteDto(note), HttpStatus.CREATED);
     }
 
+    /**
+     * Update an existing note by ID for the authenticated user.
+     * @param id
+     * @param noteDto
+     * @return
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PutMapping("/notes/{id}")
     public ResponseEntity<NoteDto> updateNote(@PathVariable Long id, @RequestBody NoteDto noteDto) {
@@ -78,6 +112,10 @@ public class NoteController {
         return ResponseEntity.ok(new NoteDto(note));
     }
 
+    /**
+     * Delete a note by ID for the authenticated user.
+     * @param id
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @DeleteMapping("/notes/{id}")
     public void deleteNote(@PathVariable Long id) {
@@ -86,6 +124,11 @@ public class NoteController {
         service.deleteNote(id, me);
     }
 
+    /**
+     * Share a note with another user's ID for the authenticated user.
+     * @param id
+     * @param dto
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/notes/{id}/share")
     public void shareNote(@PathVariable Long id, @Valid @RequestBody ShareNoteDto dto) {

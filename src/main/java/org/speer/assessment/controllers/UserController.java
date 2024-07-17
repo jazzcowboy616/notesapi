@@ -18,6 +18,12 @@ public class UserController {
         this.repo = repo;
     }
 
+    /**
+     * Get an user by id
+     *
+     * @param id
+     * @return
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @GetMapping("{id}")
     public ResponseEntity<User> getById(@PathVariable Long id) {

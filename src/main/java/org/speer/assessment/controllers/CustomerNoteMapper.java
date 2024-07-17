@@ -10,6 +10,13 @@ import org.speer.assessment.entities.Note;
 @Mapper(componentModel = "Spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CustomerNoteMapper {
+    /**
+     * Copy DTO instance to Entity instance
+     * field "author" is ignored
+     *
+     * @param note
+     * @param entity
+     */
     @Mapping(target = "author", ignore = true)
     void updateCustomerFromReq(NoteDto note, @MappingTarget Note entity);
 }

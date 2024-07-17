@@ -27,6 +27,14 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    /**
+     * extract attribute value from jwt token by specific resolver
+     *
+     * @param token
+     * @param claimsResolver
+     * @param <T>
+     * @return
+     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -44,6 +52,13 @@ public class JwtService {
         return jwtExpiration;
     }
 
+    /**
+     * Generate token using HS256 algorithm
+     * @param extraClaims
+     * @param userDetails
+     * @param expiration
+     * @return
+     */
     private String buildToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,
@@ -81,6 +96,10 @@ public class JwtService {
                 .getBody();
     }
 
+    /**
+     * calculate sha key base on configured secret key
+     * @return
+     */
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);

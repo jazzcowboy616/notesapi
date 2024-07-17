@@ -25,6 +25,12 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
+    /**
+     * create a new user account.
+     *
+     * @param registerUserDto
+     * @return
+     */
     @MyRateLimiter(value = "${web.ratelimiter.qps}", timeout = "${web.ratelimiter.timeout}")
     @PostMapping("/signup")
     public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
@@ -35,6 +41,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(registeredUser);
     }
 
+    /**
+     * log in to an existing user account and receive an access token.
+     * @param loginUserDto
+     * @return
+     */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@Valid @RequestBody LoginUserDto loginUserDto) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);

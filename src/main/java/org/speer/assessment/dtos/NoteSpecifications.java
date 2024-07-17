@@ -14,6 +14,7 @@ public class NoteSpecifications {
         return (root, query, cb) -> {
             if (search == null || search.isBlank()) return null;
 
+            // generate a query that full text matching or fuzzy match to title or content
             List<Predicate> listOr = new ArrayList<>();
             listOr.add(cb.isTrue(
                     cb.function(
@@ -33,6 +34,7 @@ public class NoteSpecifications {
 
     public static Specification<Note> author(User author) {
         return (root, query, cb) -> {
+            // is author or is in share list
             List<Predicate> listOr = new ArrayList<>();
             listOr.add(cb.equal(root.get("author"), author));
             listOr.add(cb.equal(root.joinSet("shareList", JoinType.LEFT), author));
