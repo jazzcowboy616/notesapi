@@ -20,8 +20,8 @@ keywords.
 
 ## Get Started
 
-See the guide on getting started with the Note API *
-*[here](https://github.com/jazzcowboy616/notesapi/blob/master/QuickStarted.md)**.
+See the guide on getting started with the Note API 
+[**here**](https://github.com/jazzcowboy616/notesapi/blob/master/QuickStarted.md).
 
 ## Test
 
@@ -39,8 +39,8 @@ See the guide on getting started with the Note API *
    ```
 
 You can also test the API using a tool like Postman or curl.
-I've attached postman collection json *
-*[here](https://github.com/jazzcowboy616/notesapi/blob/master/src/main/resources/Note%20api.postman_collection.json)**.
+I've attached postman collection json 
+[**here**](https://github.com/jazzcowboy616/notesapi/blob/master/src/main/resources/Note%20api.postman_collection.json).
 
 ## APIs
 
