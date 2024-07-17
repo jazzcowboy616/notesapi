@@ -21,7 +21,7 @@ keywords.
 ## Get Started
 
 See the guide on getting started with the Note API 
-[**here**](https://github.com/jazzcowboy616/notesapi/blob/master/QuickStarted.md)**.
+[**here**](https://github.com/jazzcowboy616/notesapi/blob/master/QuickStarted.md).
 
 ## Test
 
